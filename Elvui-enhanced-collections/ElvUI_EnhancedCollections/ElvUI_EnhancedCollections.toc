@@ -1,0 +1,11 @@
+## Interface: 30300
+## Title: |cff1784d1ElvUI|r Enhanced Collections
+## Notes: An ElvUI skin for Whitemane/Rebuffed Collections. Presentation only.
+## Author: Rodrigo
+## Version: 1.1.0
+## RequiredDeps: ElvUI
+## OptionalDeps: ElvUI_Enhanced, ElvUI_ProjectZidras
+
+Core.lua
+Skin.lua
+Options.lua

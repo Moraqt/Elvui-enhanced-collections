@@ -1,0 +1,58 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="RebuffedMenu.lua"/>
+    <Script file="RebuffedFilterDropDown.lua"/>
+    <Button name="RebuffedFilterDropDownButtonTemplate" text="FILTER" inherits="DropdownButtonArtTemplate" virtual="true">
+        <Frames>
+            <Button parentKey="ClearFilterButton" hidden="true">
+                <Size x="23" y="23"/>
+
+                <Anchors>
+                    <Anchor point="CENTER" relativePoint="TOPLEFT" x="3" y="0"/>
+                </Anchors>
+
+                <Layers>
+                    <Layer level="HIGHLIGHT">
+                        <Texture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD" setAllPoints="true"/>
+                    </Layer>
+                </Layers>
+
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():ClearFilters()
+                        self:GetParent():CloseMenu()
+                        self:Hide()
+                    </OnClick>
+                    <OnEnter>
+                        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+                        GameTooltip:SetText(CLEAR_FILTER, 1, 1, 1)
+                        GameTooltip:Show()
+                    </OnEnter>
+                    <OnLeave>
+                        GameTooltip:Hide()
+                    </OnLeave>
+
+                </Scripts>
+
+                <NormalTexture parentKey="NormalTexture">
+                    <Size x="23" y="23"/>
+                </NormalTexture>
+            </Button>
+
+        </Frames>
+
+        <Scripts>
+            <OnLoad>
+                -- The era replaces an inherited handler rather than chaining it, so the art template's
+                -- own OnLoad never runs for this button and its mixin is taken here instead.
+                MixinAndLoadScripts(self, "DropdownButtonArtMixin")
+                self:UpdateArt()
+                MixinAndLoadScripts(self, "RebuffedFilterDropDownButtonMixin")
+                self.ClearFilterButton.NormalTexture:SetAtlas("auctionhouse-ui-filter-redx")
+            </OnLoad>
+            <OnClick>
+                self:ToggleMenu()
+                PlaySound("UChatScrollButton")
+            </OnClick>
+        </Scripts>
+    </Button>
+</Ui>

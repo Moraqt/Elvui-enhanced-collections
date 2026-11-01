@@ -1,0 +1,30 @@
+{
+  "version": "1.1.0",
+  "date": "2026-11-01",
+  "resolution": "1920x1080",
+  "installed_with_user_permission": true,
+  "modified_client_scope": "Interface/AddOns/ElvUI_EnhancedCollections only",
+  "backup": "backups/installed-1.0.1-before-design-pass",
+  "verified_live": [
+    "Mounts: styled list, selection, model preview and wrapped description",
+    "Companions: styled list, selection, model preview and description",
+    "Toys: styled cards and paging from page 1 to page 2",
+    "Heirlooms: styled cards, collected and uncollected icons, dynamic page 2 entries and headers",
+    "Heirlooms: final class-dropdown alignment and removal of decorative child overlays",
+    "Appearances Items: neutral tile borders, backgrounds and loaded native models",
+    "Appearances Sets: list selection, changed set title and loaded native models",
+    "Final Items/Sets script hooks retain equal button sizes after the native XML-bound click handler",
+    "Collections filter menus: matching white text, check states and closing without selecting",
+    "In-game local full-skin health check returned: Collections: 1.1.0 true true",
+    "Final installed code reloaded and the corrected tab click and filter styling inspected"
+  ],
+  "not_executed_live": [
+    "Summoning or dismissing mounts and companions",
+    "Using toys or creating heirlooms",
+    "Applying paid transmogrification",
+    "Transmogrifier NPC outer frame",
+    "Exhaustive search and filter combinations",
+    "Performance profiling"
+  ],
+  "regressions": "18 Lua 5.1 checks passed; see validation.json"
+}

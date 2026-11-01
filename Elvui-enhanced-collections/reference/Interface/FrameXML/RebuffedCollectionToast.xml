@@ -1,0 +1,70 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="RebuffedCollectionToast.lua"/>
+
+	<!-- FULLSCREEN_DIALOG, not the achievement alert's DIALOG: the shop is a FULLSCREEN frame and
+	     its purchase toast would otherwise rise behind it, unseen. -->
+	<Frame name="CollectionToast" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" hidden="true">
+		<Size x="253" y="75"/>
+		<Anchors>
+			<Anchor point="BOTTOM" x="0" y="128"/>
+		</Anchors>
+		<Animations>
+			<AnimationGroup name="$parentAnimIn" parentKey="animIn">
+				<Alpha change="-1" duration="0" order="1"/>
+				<Alpha change="1" duration="0.2" order="2"/>
+			</AnimationGroup>
+			<AnimationGroup name="$parentWaitAndAnimOut" parentKey="waitAndAnimOut">
+				<Alpha startDelay="4.05" change="-1" duration="1.5" parentKey="animOut">
+					<Scripts>
+						<OnFinished>
+							self:GetRegionParent():Hide();
+						</OnFinished>
+					</Scripts>
+				</Alpha>
+			</AnimationGroup>
+		</Animations>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground" parentKey="Background">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" parentKey="Icon">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="LEFT" x="18" y="0"/>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" parentKey="Title" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size x="175" y="12"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPRIGHT" x="10" y="-2"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentName" parentKey="Name" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size x="175" y="0"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentIcon" relativePoint="BOTTOMRIGHT" x="10" y="2"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>CollectionToast_OnLoad(self)</OnLoad>
+			<OnEvent>CollectionToast_OnEvent(self, event, ...)</OnEvent>
+			<OnHide>CollectionToast_OnHide(self)</OnHide>
+		</Scripts>
+	</Frame>
+
+	<!-- The next queued toast waits one frame here. A Play() issued inside the finishing group's
+	     OnFinished chain is dropped by the client, and the queued toast then never faded. -->
+	<Frame name="CollectionToastQueue" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnUpdate>CollectionToastQueue_OnUpdate(self)</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

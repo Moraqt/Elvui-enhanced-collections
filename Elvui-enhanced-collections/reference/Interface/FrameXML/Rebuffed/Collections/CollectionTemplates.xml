@@ -1,0 +1,250 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+	<Script file="CollectionTemplates.lua"/>
+
+	<!-- Retail's Blizzard_CollectionTemplates.xml, the pieces every collection page shares. They
+	     were the wardrobe's until the toy box needed them too, and the wardrobe addon loads after
+	     this one, so they live where both can reach them, under the names retail gives them. -->
+
+	<!-- The row geometry the two list panes have to keep in step. A row body is 208x46 and does
+	     not stretch across the gutter to its left; the 38x38 icon sits in that gutter, which is
+	     what leaves room for a favourite marker and a border to hang off the icon without
+	     overlapping the text. What a row draws beyond that, and what it does when clicked, is the
+	     pane's own; the collection list and the set list agree on the frame and on nothing else. -->
+	<Button name="CollectionsRowTemplate" virtual="true">
+		<Size x="208" y="46"/>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" parentKey="Icon">
+					<Size x="38" y="38"/>
+					<Anchors>
+						<Anchor point="LEFT" x="-42" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<!-- Retail anchors this bar at the frame top less 39, from a pane that covers the whole
+	     window. Our toy and heirloom panes start 21 below the title bar, as the mount panel
+	     does, so the default carries that 21 already; the wardrobe hangs its own off the tab
+	     row, the way retail does. -->
+	<StatusBar name="CollectionsProgressBarTemplate" virtual="true">
+		<Size x="196" y="13"/>
+		<Anchors>
+			<Anchor point="TOP" x="0" y="-18"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="text" inherits="TextStatusBarText" justifyH="CENTER">
+					<Size x="0" y="9"/>
+					<Anchors>
+						<Anchor point="CENTER" y="1"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="border" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+					<Size x="205" y="29"/>
+					<Anchors>
+						<Anchor point="LEFT" x="-5" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="1"/>
+					</Anchors>
+					<Color r="0.0" g="0.0" b="0.0" a="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				MixinAndLoad(self, "CollectionsProgressBarMixin")
+			</OnLoad>
+		</Scripts>
+		<BarTexture file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar"/>
+		<BarColor r="0.03125" g="0.85" b="0.0"/>
+	</StatusBar>
+
+	<FontString name="CollectionsPageTextTemplate" inherits="GameFontWhite" justifyH="RIGHT" virtual="true">
+		<Size x="102" y="0"/>
+	</FontString>
+	<Button name="CollectionsPrevPageButton" virtual="true">
+		<Size x="32" y="32"/>
+		<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+		<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+	<Button name="CollectionsNextPageButton" virtual="true">
+		<Size x="32" y="32"/>
+		<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+		<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+	<Frame name="CollectionsPagingFrameTemplate" virtual="true">
+		<Size x="33" y="32"/>
+		<Frames>
+			<Button name="$parentPrevPageButton" parentKey="PrevPageButton" inherits="CollectionsPrevPageButton">
+				<Anchors>
+					<Anchor point="LEFT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():PreviousPage();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button parentKey="NextPageButton" inherits="CollectionsNextPageButton">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentPrevPageButton" relativePoint="RIGHT" x="3" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():NextPage();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="PageText" inherits="CollectionsPageTextTemplate"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				MixinAndLoad(self, "CollectionsPagingMixin")
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+
+	<!-- One item in a collection: its icon, its name beside it, and a frame that says whether the
+	     account has it. Retail's CollectionsSpellButtonTemplate, less what this client has no use
+	     for - no secure frame, because using a toy here is a packet rather than a protected
+	     action, and no fanfare model scene. The toy box and the heirloom collection both draw
+	     their rows with it; the atlas textures are set by whichever mixin owns the button, since
+	     the era's XML has no atlas attribute. -->
+	<Button name="CollectionsItemButtonTemplate" virtual="true">
+		<Size x="50" y="50"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" hidden="true">
+					<Size x="42" y="42"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="1"/>
+					</Anchors>
+					<TexCoords left="0.04347826" right="0.95652173" top="0.04347826" bottom="0.95652173"/>
+				</Texture>
+
+				<Texture parentKey="IconUncollected" alpha="0.18" hidden="true">
+					<Size x="42" y="41"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="2"/>
+					</Anchors>
+					<TexCoords left="0.063" right="0.938" top="0.063" bottom="0.917"/>
+				</Texture>
+
+				<Texture parentKey="SlotFrameUncollectedInnerGlow" alpha="0.18" hidden="true">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="2"/>
+					</Anchors>
+				</Texture>
+
+				<FontString parentKey="Name" inherits="GameFontNormal" maxLines="3" justifyH="LEFT">
+					<Size x="135" y="0"/>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" x="9" y="3"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+
+			<Layer level="OVERLAY" textureSubLevel="1">
+				<Texture parentKey="SlotFrameCollected">
+					<Size x="56" y="56"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="SlotFrameUncollected" hidden="true">
+					<Size x="50" y="50"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<Texture parentKey="NewGlow" hidden="true">
+					<Size x="59" y="37"/>
+					<Anchors>
+						<Anchor point="CENTER" x="8" y="0" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<FontString parentKey="New" inherits="GameFontHighlight" maxLines="1" justifyH="CENTER" text="NEW_CAPS" hidden="true">
+					<Anchors>
+						<Anchor point="CENTER" x="8" y="0" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="Favorite" hidden="true">
+					<Size x="31" y="33"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-12" y="13"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="5" y="-4"/>
+					<Anchor point="BOTTOMRIGHT" x="-5" y="7"/>
+				</Anchors>
+			</Cooldown>
+		</Frames>
+		<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress">
+			<Size x="42" y="42"/>
+			<Anchors>
+				<Anchor point="CENTER" x="0" y="1"/>
+			</Anchors>
+		</PushedTexture>
+		<HighlightTexture parentKey="Highlight" file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD">
+			<Size x="48" y="48"/>
+			<Anchors>
+				<Anchor point="CENTER" x="0" y="2"/>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<!-- The two tabs that draw items: the same button, each with its own behaviour. -->
+	<Button name="ToySpellButtonTemplate" inherits="CollectionsItemButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				MixinAndLoadScripts(self, "ToySpellButtonMixin")
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<Button name="HeirloomButtonTemplate" inherits="CollectionsItemButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				MixinAndLoadScripts(self, "HeirloomButtonMixin")
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<!-- The tab retail's Collections window wears. Its art is Interface\FrameGeneral\UIFrameTabs,
+	     six members on atlas 2134 - an inactive tab and an active one, each in three slices -
+	     which the atlas rows in SharedXML/AtlasInfo.lua spread over the sixteen names
+	     ThreeSliceButtonMixin asks for. Only this window uses TabSystemMixin, so nothing else
+	     changes shape. -->
+	<CheckButton name="CollectionsTabTemplate" inherits="TabSystemTabTemplate" virtual="true">
+		<Size x="95" y="36"/>
+		<Attributes>
+			<Attribute name="atlasName" value="uiframe-tab"/>
+		</Attributes>
+	</CheckButton>
+</Ui>

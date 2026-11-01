@@ -1,0 +1,638 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="CollectionsJournal.lua"/>
+
+	<!-- Retail's MountListButtonTemplate. The pill does not start at the list's left edge: the
+	     scroll view reserves a gutter for the icon (view:SetPadding(0, 0, 44, 0, 0)) and the icon
+	     hangs outside the pill in it, at LEFT -42, with a WhiteIconFrame over it. The pill fills
+	     what is left of the width, which is 208 in retail's window and 199 in this one; the number
+	     that is retail's geometry is the 44, not the 208. RebuffedHybridScrollFrame_CreateButtons
+	     sets the TOPLEFT at that 44, so this template supplies the only size and no anchor.
+	     The WhiteIconFrame border over the icon and the loading circle in the display pane are
+	     retail files this era has none of; both were pulled with rb-casc into Interface\Common. -->
+	<Button name="CollectionsListButtonTemplate" inherits="CollectionsRowTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" setAllPoints="true"/>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture parentKey="Selected" setAllPoints="true" hidden="true"/>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" parentKey="Name" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="8" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="-6" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentIconBorder" parentKey="IconBorder" file="Interface\Common\WhiteIconFrame">
+					<Size x="38" y="38"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIcon"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="$parentFavorite" parentKey="Favorite" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPLEFT" x="-7" y="7"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Icon" setAllPoints="true"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						self:GetParent():ToggleFavorite()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				MixinAndLoadScripts(self, "CollectionsListButtonMixin")
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<Frame name="CollectionsJournal" inherits="PortraitFrameTemplate" parent="UIParent" toplevel="true" enableMouse="true" movable="true" clampedToScreen="true" hidden="true">
+		<Size x="703" y="606"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" x="16" y="-116"/>
+		</Anchors>
+
+		<Frames>
+			<!-- The toy box. Retail's Blizzard_ToyBox.xml: eighteen icons to a page in three
+			     columns, a progress bar over them and the paging strip under them. It is its own
+			     frame rather than a kind of the journal panel, because a toy has no creature to
+			     pose and nothing to say in a details pane - retail shows the same. -->
+			<Frame name="$parentToyBox" parentKey="ToyBox" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-21"/>
+					<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+
+				<Frames>
+					<StatusBar name="$parentProgressBar" parentKey="ProgressBar" inherits="CollectionsProgressBarTemplate"/>
+
+					<EditBox name="$parentSearchBox" parentKey="SearchBox" inherits="SearchBoxTemplate" letters="40">
+						<Size x="115" y="20"/>
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-107" y="-14"/>
+						</Anchors>
+						<Scripts>
+							<OnTextChanged>
+								SearchBoxTemplate_OnTextChanged(self)
+								self:GetParent():RefreshList()
+							</OnTextChanged>
+						</Scripts>
+					</EditBox>
+
+					<Button name="$parentFilterButton" parentKey="FilterButton" inherits="RebuffedFilterDropDownButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-12" y="-12"/>
+						</Anchors>
+					</Button>
+
+					<Frame name="$parentIconsFrame" parentKey="IconsFrame" inherits="CollectionsBackgroundTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" x="4" y="-39"/>
+							<Anchor point="BOTTOMRIGHT" x="-6" y="5"/>
+						</Anchors>
+						<Frames>
+					<Button name="$parentButton1" parentKey="Button1" inherits="ToySpellButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" x="40" y="-53"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton2" parentKey="Button2" inherits="ToySpellButtonTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton3" parentKey="Button3" inherits="ToySpellButtonTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton4" parentKey="Button4" inherits="ToySpellButtonTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT" x="0" y="-16"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton5" parentKey="Button5" inherits="ToySpellButtonTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton6" parentKey="Button6" inherits="ToySpellButtonTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton7" parentKey="Button7" inherits="ToySpellButtonTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT" x="0" y="-16"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton8" parentKey="Button8" inherits="ToySpellButtonTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton9" parentKey="Button9" inherits="ToySpellButtonTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton8" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton10" parentKey="Button10" inherits="ToySpellButtonTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT" x="0" y="-16"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton11" parentKey="Button11" inherits="ToySpellButtonTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton10" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton12" parentKey="Button12" inherits="ToySpellButtonTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton11" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton13" parentKey="Button13" inherits="ToySpellButtonTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton10" relativePoint="BOTTOMLEFT" x="0" y="-16"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton14" parentKey="Button14" inherits="ToySpellButtonTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton13" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton15" parentKey="Button15" inherits="ToySpellButtonTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton14" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton16" parentKey="Button16" inherits="ToySpellButtonTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton13" relativePoint="BOTTOMLEFT" x="0" y="-16"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton17" parentKey="Button17" inherits="ToySpellButtonTemplate" id="17">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton16" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton18" parentKey="Button18" inherits="ToySpellButtonTemplate" id="18">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton17" relativePoint="TOPLEFT" x="208" y="0"/>
+						</Anchors>
+					</Button>
+						</Frames>
+					</Frame>
+
+					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
+						<Anchors>
+							<Anchor point="BOTTOM" x="21" y="22"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+
+				<Scripts>
+					<OnLoad>
+						MixinAndLoadScripts(self, "ToyBoxMixin")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- The heirloom collection. Retail's Blizzard_HeirloomCollection.xml: rows of items
+			     under a heading for each slot, paged, with a class filter beside the search box.
+			     The buttons and the headings are made as a page needs them, the way retail pools
+			     its own, because how many a page holds depends on what the filters left. -->
+			<Frame name="$parentHeirlooms" parentKey="Heirlooms" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-21"/>
+					<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+
+				<Frames>
+					<StatusBar name="$parentProgressBar" parentKey="ProgressBar" inherits="CollectionsProgressBarTemplate"/>
+
+					<EditBox name="$parentSearchBox" parentKey="SearchBox" inherits="SearchBoxTemplate" letters="40">
+						<Size x="115" y="20"/>
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-107" y="-14"/>
+						</Anchors>
+						<Scripts>
+							<OnTextChanged>
+								SearchBoxTemplate_OnTextChanged(self)
+								self:GetParent():RefreshList()
+							</OnTextChanged>
+						</Scripts>
+					</EditBox>
+
+					<Button name="$parentFilterButton" parentKey="FilterButton" inherits="RebuffedFilterDropDownButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-12" y="-12"/>
+						</Anchors>
+					</Button>
+
+					<Button name="$parentClassDropDown" parentKey="ClassDropDown" inherits="DropdownButtonArtTemplate">
+						<Size x="150" y="26"/>
+
+						<Anchors>
+							<Anchor point="TOPLEFT" x="70" y="-9"/>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								-- The era replaces an inherited handler rather than chaining it, so the art
+								-- template's own OnLoad never runs here and its mixin is taken by hand.
+								MixinAndLoadScripts(self, "DropdownButtonArtMixin")
+								self:UpdateArt()
+							</OnLoad>
+							<OnClick>
+								self:GetParent():ToggleClassMenu()
+								PlaySound("UChatScrollButton")
+							</OnClick>
+							<OnHide>
+								RebuffedMenu:Close(self)
+							</OnHide>
+						</Scripts>
+					</Button>
+
+					<Frame name="$parentIconsFrame" parentKey="IconsFrame" inherits="CollectionsBackgroundTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" x="4" y="-39"/>
+							<Anchor point="BOTTOMRIGHT" x="-6" y="5"/>
+						</Anchors>
+					</Frame>
+
+					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
+						<Anchors>
+							<Anchor point="BOTTOM" x="21" y="22"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+
+				<Scripts>
+					<OnLoad>
+						MixinAndLoadScripts(self, "HeirloomsMixin")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentPanel" parentKey="Journal" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-21"/>
+					<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+
+				<Frames>
+					<!-- Retail's mount journal carries no progress bar: a 130x20 count inset at the top
+					     left, and the search box and the filter inside the list frame. Anchors are
+					     blizzard_mountcollection.xml's own, with its y shifted by this panel's 21 of
+					     offset from the frame. -->
+					<Frame name="$parentCount" parentKey="Count" inherits="InsetFrameTemplate2">
+						<Size x="130" y="20"/>
+						<Anchors>
+							<Anchor point="TOPLEFT" x="70" y="-14"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTotal" parentKey="Total" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" x="-10" y="0"/>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentLabel" parentKey="Label" inherits="GameFontNormalSmall" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="LEFT" x="10" y="0"/>
+										<Anchor point="RIGHT" relativeTo="$parentTotal" relativePoint="LEFT" x="-3" y="0"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+
+
+					<Frame name="$parentList" parentKey="List" inherits="InsetFrameTemplate2">
+						<Anchors>
+							<Anchor point="TOPLEFT" x="4" y="-39"/>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="264" y="34"/>
+						</Anchors>
+						<Frames>
+							<ScrollFrame name="$parentScrollFrame" parentKey="ScrollFrame" inherits="RebuffedHybridScrollFrameTemplate">
+								<!-- 252 of content: the 44 gutter and the 208 pill, which is
+								     exactly the 260 inset less four pixels either side. The bar is
+								     not in here: retail puts it outside the list altogether, in the
+								     gap before the model pane, with its own track and steppers. -->
+								<Anchors>
+									<Anchor point="TOPLEFT" x="4" y="-36"/>
+									<Anchor point="BOTTOMRIGHT" x="-4" y="3"/>
+								</Anchors>
+								<Frames>
+									<Button name="$parentScrollBar" parentKey="scrollBar" inherits="ProportionalScrollListBarTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="10" y="-12"/>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="10" y="12"/>
+										</Anchors>
+									</Button>
+
+									<Button name="$parentScrollUp" parentKey="scrollUp" inherits="MinimalScrollBarStepperScripts">
+										<Size x="14" y="9"/>
+										<Anchors>
+											<Anchor point="BOTTOM" relativeTo="$parentScrollBar" relativePoint="TOP" x="0" y="1"/>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												RebuffedHybridScrollFrameScrollButton_OnClick(self, button, down)
+											</OnClick>
+										</Scripts>
+										<Attributes>
+											<Attribute name="direction" value="1" type="number"/>
+											<Attribute name="normalTexture" value="minimal-scrollbar-arrow-top"/>
+											<Attribute name="overTexture" value="minimal-scrollbar-arrow-top-over"/>
+											<Attribute name="downTexture" value="minimal-scrollbar-arrow-top-down"/>
+										</Attributes>
+									</Button>
+
+									<Button name="$parentScrollDown" parentKey="scrollDown" inherits="MinimalScrollBarStepperScripts">
+										<Size x="14" y="9"/>
+										<Anchors>
+											<Anchor point="TOP" relativeTo="$parentScrollBar" relativePoint="BOTTOM" x="0" y="-1"/>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												RebuffedHybridScrollFrameScrollButton_OnClick(self, button, down)
+											</OnClick>
+										</Scripts>
+										<Attributes>
+											<Attribute name="direction" value="-1" type="number"/>
+											<Attribute name="normalTexture" value="minimal-scrollbar-arrow-bottom"/>
+											<Attribute name="overTexture" value="minimal-scrollbar-arrow-bottom-over"/>
+											<Attribute name="downTexture" value="minimal-scrollbar-arrow-bottom-down"/>
+										</Attributes>
+									</Button>
+								</Frames>
+							</ScrollFrame>
+						</Frames>
+					</Frame>
+					<EditBox name="$parentSearchBox" parentKey="SearchBox" inherits="SearchBoxTemplate">
+						<Size x="145" y="20"/>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentList" relativePoint="TOPLEFT" x="15" y="-9"/>
+						</Anchors>
+						<Scripts>
+							<OnTextChanged>
+								SearchBoxTemplate_OnTextChanged(self)
+								self:GetParent():RefreshList()
+							</OnTextChanged>
+						</Scripts>
+					</EditBox>
+
+					<Button name="$parentFilterButton" parentKey="FilterButton" inherits="RebuffedFilterDropDownButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentList" relativePoint="TOPRIGHT" x="-5" y="-10"/>
+						</Anchors>
+					</Button>
+
+					<Frame name="$parentDisplay" parentKey="Display" inherits="InsetFrameTemplate2">
+						<Anchors>
+							<Anchor point="TOPLEFT" x="284" y="-39"/>
+							<Anchor point="BOTTOMRIGHT" x="-6" y="6"/>
+						</Anchors>
+
+						<!-- The pane's own background, as retail has it. It used to hang off the
+						     model, which is hidden whenever nothing is selected or the creature is
+						     not cached yet, and the inset showed through as a black hole. -->
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture parentKey="Background">
+									<Anchors>
+										<Anchor point="TOPLEFT" x="2" y="-2"/>
+										<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+
+						<Frames>
+							<!-- Shown while the client is fetching the creature. Its own frame rather
+							     than a bare texture so the rotation starts and stops with it and no
+							     Lua has to reach for the animation. Same art and turn as
+							     InputBlockLoadingTemplate, which the overlay already had. -->
+							<!-- Retail drives these off a ModelScene orbit camera, which this era has no widget
+							     for. The era has its own pair on the dress-up frame and this borrows their art
+							     and their step; the turn itself does not go through Model_Rotate*, because those
+							     drive model.rotation through SetRotation and this model lives on SetFacing, which
+							     is also what dragging it uses. Dragging already turns it; these are the click way. -->
+							<Button name="$parentRotateLeftButton" parentKey="RotateLeftButton">
+								<Size x="32" y="32"/>
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" x="10" y="10"/>
+								</Anchors>
+								<Scripts>
+									<OnMouseDown>
+										CollectionsRotateButton_OnMouseDown(self, -1)
+									</OnMouseDown>
+									<OnMouseUp>
+										CollectionsRotateButton_OnMouseUp(self)
+									</OnMouseUp>
+									<OnHide>
+										CollectionsRotateButton_OnMouseUp(self)
+									</OnHide>
+								</Scripts>
+								<NormalTexture file="Interface\Buttons\UI-RotationLeft-Button-Up"/>
+								<PushedTexture file="Interface\Buttons\UI-RotationLeft-Button-Down"/>
+								<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+							</Button>
+
+							<Button parentKey="RotateRightButton">
+								<Size x="32" y="32"/>
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="$parentRotateLeftButton" relativePoint="RIGHT" x="2" y="0"/>
+								</Anchors>
+								<Scripts>
+									<OnMouseDown>
+										CollectionsRotateButton_OnMouseDown(self, 1)
+									</OnMouseDown>
+									<OnMouseUp>
+										CollectionsRotateButton_OnMouseUp(self)
+									</OnMouseUp>
+									<OnHide>
+										CollectionsRotateButton_OnMouseUp(self)
+									</OnHide>
+								</Scripts>
+								<NormalTexture file="Interface\Buttons\UI-RotationRight-Button-Up"/>
+								<PushedTexture file="Interface\Buttons\UI-RotationRight-Button-Down"/>
+								<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+							</Button>
+
+							<!-- Retail's mount preview carries this at the bottom right, with the label
+							     to the left of the box: the character in the saddle, or the mount alone.
+							     Only the mounts have it, as in retail; the panel is shared with the
+							     companions, where there is nothing to ride. -->
+							<CheckButton name="$parentShowPlayer" parentKey="ShowPlayer" inherits="UICheckButtonTemplate">
+								<Size x="26" y="26"/>
+								<Anchors>
+									<Anchor point="BOTTOMRIGHT" x="-8" y="6"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										local text = _G[self:GetName() .. "Text"]
+										text:SetFontObject("GameFontNormalSmall")
+										text:SetText(MOUNT_JOURNAL_SHOW_PLAYER_TOGGLE)
+										text:ClearAllPoints()
+										text:SetPoint("RIGHT", self, "LEFT", 0, 1)
+									</OnLoad>
+									<OnClick>
+										CollectionsShowPlayer_OnClick(self)
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+
+							<Frame parentKey="Spinner" hidden="true">
+								<Size x="64" y="70"/>
+								<Anchors>
+									<Anchor point="CENTER"/>
+								</Anchors>
+								<Layers>
+									<Layer level="OVERLAY">
+										<Texture parentKey="Texture" setAllPoints="true">
+											<Animations>
+												<AnimationGroup parentKey="Anim" looping="REPEAT">
+																				<Rotation duration="1" degrees="-360"/>
+												</AnimationGroup>
+											</Animations>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnLoad>
+										self.Texture:SetAtlas("collections-loading-spinner")
+										-- Same compensation as the pane background: the client writes the
+										-- file size over setAllPoints for this one.
+										self.Texture:SetSize(64, 70)
+									</OnLoad>
+									<OnShow>
+										self.Texture.Anim:Play()
+									</OnShow>
+									<OnHide>
+										self.Texture.Anim:Stop()
+									</OnHide>
+								</Scripts>
+							</Frame>
+
+							<DressUpModel name="$parentModel" parentKey="Model">
+								<Anchors>
+									<Anchor point="TOPLEFT" x="2" y="-2"/>
+									<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+								</Anchors>
+
+								<!-- The pane carries this art as well, for the states where the model
+								     is hidden. It has to be here too because this era's Model widget
+								     clears its viewport to black and offers no SetBackgroundColor to
+								     turn that off, so a background behind it is simply not seen.
+								     Retail's model is transparent and needs only the pane's copy. -->
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture parentKey="Background" setAllPoints="true"/>
+									</Layer>
+								</Layers>
+
+								<Scripts>
+									<OnLoad>
+										self:SetFacing(0.45)
+										MixinAndLoad(self, "ModelMixin")
+										self:SetEnableDragRotation(true)
+										self:SetEnableScrollZoom(true)
+										self:SetMinMaxDistance(-1.4, 1.4)
+									</OnLoad>
+								</Scripts>
+							</DressUpModel>
+
+							<Frame name="$parentInfo" parentKey="Info" hidden="true">
+								<Size x="403" y="200"/>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="14" y="-14"/>
+								</Anchors>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentName" parentKey="Name" inherits="GameFontNormalLarge" justifyH="LEFT">
+											<Size x="403" y="0"/>
+											<Anchors>
+												<Anchor point="TOPLEFT"/>
+											</Anchors>
+										</FontString>
+										<FontString name="$parentSource" parentKey="Source" inherits="GameFontHighlightSmall" justifyH="LEFT">
+											<Size x="403" y="0"/>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT" y="-2"/>
+											</Anchors>
+										</FontString>
+										<FontString name="$parentDescription" parentKey="Description" inherits="GameFontHighlightSmall" justifyH="LEFT">
+											<Size x="403" y="0"/>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parentSource" relativePoint="BOTTOMLEFT" y="-6"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame>
+
+						</Frames>
+					</Frame>
+
+					<!-- Retail keeps one button under the list and the random one up in the header
+					     (blizzard_mountcollection.xml: MountButton at BOTTOMLEFT, the random-favourite
+					     frame at TOPRIGHT -8,-25). -->
+					<Button name="$parentSummonButton" parentKey="SummonButton" inherits="UIPanelButtonTemplate" text="SUMMON">
+						<Size x="140" y="22"/>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" x="4" y="6"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								self:GetParent():SummonSelected()
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="$parentRandomFavoriteButton" parentKey="RandomFavoriteButton" inherits="UIPanelButtonTemplate" text="COLLECTIONS_SUMMON_RANDOM_FAVORITE">
+						<Size x="200" y="22"/>
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-8" y="-4"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								self:GetParent():SummonRandomFavorite()
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+
+				<Scripts>
+					<OnLoad>
+						MixinAndLoadScripts(self, "CollectionsJournalPanelMixin")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				MixinAndLoadScripts(self, "CollectionsJournalMixin")
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

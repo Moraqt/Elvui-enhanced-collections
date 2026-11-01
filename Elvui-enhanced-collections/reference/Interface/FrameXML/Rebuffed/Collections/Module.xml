@@ -1,0 +1,6 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Include file="CollectionTemplates.xml"/>
+    <Script file="ToyBox.lua"/>
+    <Script file="Heirlooms.lua"/>
+    <Include file="CollectionsJournal.xml"/>
+</Ui>

@@ -1,0 +1,46 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Script file="FilterDropDown.lua"/>
+
+    <!-- Retail's dropdown button, in three pieces because the era cannot slice a texture.
+         See DropdownButtonArtMixin in FilterDropDown.lua. -->
+    <Button name="DropdownButtonArtTemplate" virtual="true">
+        <Size x="93" y="26"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentLeft" parentKey="Left">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture name="$parentRight" parentKey="Right">
+                    <Anchors>
+                        <Anchor point="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture name="$parentMiddle" parentKey="Middle">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="$parentLeft" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeTo="$parentRight" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad>
+                MixinAndLoadScripts(self, "DropdownButtonArtMixin")
+            </OnLoad>
+        </Scripts>
+        <ButtonText parentKey="Text" name="$parentText" justifyH="LEFT">
+            <Anchors>
+                <Anchor point="LEFT" x="10" y="0"/>
+                <Anchor point="RIGHT" x="-22" y="0"/>
+            </Anchors>
+        </ButtonText>
+        <NormalFont style="GameFontHighlightSmall"/>
+        <HighlightFont style="GameFontHighlightSmall"/>
+        <DisabledFont style="GameFontDisableSmall"/>
+    </Button>
+</Ui>
